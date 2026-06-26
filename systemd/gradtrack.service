@@ -1,0 +1,16 @@
+[Unit]
+Description=gradtrack - refresh graduation/ePortfolio status snapshot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust WorkingDirectory to where you cloned gradtrack.
+WorkingDirectory=%h/gradtrack
+ExecStart=/bin/bash -lc 'pnpm dev sync && pnpm dev build'
+Environment=NODE_ENV=production
+Environment=GRADTRACK_LOG_LEVEL=info
+TimeoutStartSec=10min
+
+[Install]
+WantedBy=default.target

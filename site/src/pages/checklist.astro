@@ -1,0 +1,39 @@
+---
+import Page from '../layouts/Page.astro';
+import { data, checklist } from '../lib/data.ts';
+
+const groups: Array<{ key: 'admin' | 'artifact' | 'review' | 'submission'; label: string }> = [
+  { key: 'admin', label: 'Admin' },
+  { key: 'artifact', label: 'Artifacts' },
+  { key: 'review', label: 'Review' },
+  { key: 'submission', label: 'Submission' },
+];
+---
+<Page title="Pre-graduation checklist" active="checklist" meta={[
+  `${checklist.filter((c) => c.status === 'done').length}/${checklist.length} done`,
+]} fetchedAt={data.fetched_at}>
+
+  <p>Toggle from the CLI: <code>gradtrack check &lt;id&gt; --status done</code> (or <code>todo</code>, <code>in-progress</code>). State persists to <code>~/.gradtrack/state.json</code> and is re-read on every <code>gradtrack sync</code>.</p>
+
+  {groups.map((g) => {
+    const items = checklist.filter((c) => c.category === g.key);
+    if (items.length === 0) return null;
+    return (
+      <section>
+        <h2>{g.label}</h2>
+        <ul class="checklist">
+          {items.map((c) => (
+            <li>
+              <span class={`pill ${c.status}`}>{c.status}</span>
+              <span>
+                <span class="label-text">{c.label}{c.blocking && <span class="pill gold" style="margin-left:8px">blocking</span>}</span>
+                <p class="description">{c.description}</p>
+                <code class="cli-hint">gradtrack check {c.id} --status done</code>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+</Page>

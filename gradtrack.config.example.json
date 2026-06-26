@@ -1,0 +1,159 @@
+{
+  "$schema": "./gradtrack.config.schema.json",
+  "program": {
+    "degree": "M.S. in Your Program",
+    "total_credits": 30,
+    "competencies": [
+      {
+        "id": "competency-1",
+        "group": "core",
+        "label": "First Core Competency",
+        "description": "A one-to-two sentence description of what this competency means and how the program evaluates it.",
+        "source_path": "program handbook"
+      },
+      {
+        "id": "competency-2",
+        "group": "core",
+        "label": "Second Core Competency",
+        "description": "Another competency the faculty rate your portfolio artifacts against.",
+        "source_path": "program handbook"
+      },
+      {
+        "id": "competency-3",
+        "group": "concentration",
+        "label": "Concentration Competency",
+        "description": "A competency specific to your concentration or track.",
+        "source_path": "program handbook"
+      }
+    ],
+    "comp_exam_rules": {
+      "timing": "During the term in which you plan to graduate",
+      "rubric_dimensions": ["Content", "Critical Thinking"],
+      "notes": [
+        "Replace these notes with the rules your program uses to evaluate the portfolio or comprehensive exam.",
+        "Each competency is typically rated on the rubric dimensions above."
+      ]
+    }
+  },
+  "graduation": {
+    "target_term": "Fall 2026",
+    "term_ends": {
+      "spring": "05-03",
+      "summer": "08-08",
+      "fall": "12-12"
+    },
+    "deadline_offset_days": 30
+  },
+  "requirements": [
+    {
+      "id": "submit-program-plan",
+      "label": "Submit your program plan form",
+      "description": "Confirm remaining requirements with your advisor and submit the program plan form.",
+      "status": "todo",
+      "category": "admin",
+      "blocking": true
+    },
+    {
+      "id": "apply-for-graduation",
+      "label": "Apply for graduation",
+      "description": "Submit the graduation application through your registrar or student self-service before the term deadline.",
+      "status": "todo",
+      "category": "admin",
+      "blocking": true
+    },
+    {
+      "id": "complete-capstone-portfolio",
+      "label": "Complete capstone / ePortfolio",
+      "description": "Assemble the artifacts that demonstrate each program competency into your portfolio.",
+      "status": "todo",
+      "category": "artifact",
+      "blocking": true
+    },
+    {
+      "id": "portfolio-about-me",
+      "label": "Portfolio section: About Me",
+      "description": "Short bio paragraph introducing yourself.",
+      "status": "todo",
+      "category": "artifact",
+      "blocking": false
+    },
+    {
+      "id": "portfolio-resume",
+      "label": "Portfolio section: Resume / CV",
+      "description": "Attach a current resume or CV.",
+      "status": "todo",
+      "category": "artifact",
+      "blocking": false
+    },
+    {
+      "id": "portfolio-reflective-writing",
+      "label": "Portfolio section: Reflective writing",
+      "description": "Write a reflection on your strengths, growth areas, and post-graduation plans.",
+      "status": "todo",
+      "category": "artifact",
+      "blocking": false
+    },
+    {
+      "id": "final-review",
+      "label": "Final review",
+      "description": "Have your advisor or committee review the completed portfolio before submission.",
+      "status": "todo",
+      "category": "review",
+      "blocking": true
+    },
+    {
+      "id": "submit-portfolio",
+      "label": "Submit the portfolio",
+      "description": "Submit the finished portfolio by the program deadline.",
+      "status": "todo",
+      "category": "submission",
+      "blocking": true
+    }
+  ],
+  "sources": {
+    "programInfo": {
+      "enabled": false,
+      "path": "/path/to/your/vault/Program Info.md"
+    },
+    "obsidian": {
+      "enabled": false,
+      "schoolDir": "/path/to/your/vault/School",
+      "courseToCompetency": {
+        "ABC 1234": "competency-1",
+        "DEF 5678": "competency-2"
+      }
+    },
+    "github": {
+      "enabled": false,
+      "username": "your-github-username",
+      "securityThemed": false
+    },
+    "blog": {
+      "enabled": false,
+      "dirs": [
+        { "path": "/path/to/your/blog/src/content/blog", "collection": "blog" }
+      ]
+    },
+    "canvas": {
+      "enabled": false,
+      "snapshotDir": "/path/to/your/vault/_canvas",
+      "courseId": "000000",
+      "lookbackDays": 60
+    }
+  },
+  "snapshot": {
+    "enabled": false,
+    "outDir": "/path/to/your/vault/_eportfolio"
+  },
+  "theme": {
+    "label": "gradtrack",
+    "accent": "#3D5A80",
+    "accentSoft": "#6B89AD",
+    "accentAlt": "#D97757",
+    "accentAltSoft": "#ECA88A"
+  },
+  "site": {
+    "port": 4321,
+    "allowedHosts": ["localhost", "127.0.0.1"]
+  }
+}

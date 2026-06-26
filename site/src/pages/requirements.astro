@@ -1,0 +1,89 @@
+---
+import Page from '../layouts/Page.astro';
+import { data, artifactsForCompetency } from '../lib/data.ts';
+
+const groups: Array<{ key: 'core' | 'concentration' | 'other'; label: string }> = [
+  { key: 'core', label: 'Core requirements' },
+  { key: 'concentration', label: 'Concentration' },
+  { key: 'other', label: 'Other required + practicum' },
+];
+---
+<Page title="Requirements" active="requirements" meta={[
+  data.program.comp_exam_rules.rubric_dimensions.length > 0
+    ? 'rubric: ' + data.program.comp_exam_rules.rubric_dimensions.join(' + ')
+    : 'competencies',
+]} fetchedAt={data.fetched_at}>
+
+  <p>{data.program.comp_exam_rules.timing}{data.program.comp_exam_rules.rubric_dimensions.length > 0 && (<> - each artifact is rated on {data.program.comp_exam_rules.rubric_dimensions.map((d, i) => (<>{i > 0 && ' and '}<strong>{d}</strong></>))}</>)}.</p>
+
+  {groups.map((g) => {
+    const comps = data.program.competencies.filter((c) => c.group === g.key);
+    if (comps.length === 0) return null;
+    return (
+      <section>
+        <h2>{g.label}</h2>
+        {comps.map((comp) => {
+          const arts = artifactsForCompetency(comp.id);
+          return (
+            <div>
+              <h3>{comp.label} <span class="pill bronze">{comp.id}</span></h3>
+              <p>{comp.description}</p>
+              {arts.length === 0 ? (
+                <p class="meta"><span>✗ no artifacts mapped yet</span></p>
+              ) : (
+                <ul class="cards">
+                  {arts.slice(0, 10).map((a) => {
+                    if (a.kind === 'paper') {
+                      return (
+                        <li>
+                          <div class="row1">
+                            <span class="title-text">{a.art.title}</span>
+                            <span class="sub">{a.art.course_code} · {a.art.semester}</span>
+                          </div>
+                          {a.art.summary && <p class="summary">{a.art.summary}</p>}
+                          <div class="tags">
+                            <span class={`pill ${a.art.status === 'completed' ? 'done' : a.art.status === 'in-progress' ? 'in-progress' : 'todo'}`}>{a.art.status}</span>
+                            <span class="pill bronze">{a.art.kind}</span>
+                          </div>
+                        </li>
+                      );
+                    }
+                    if (a.kind === 'blog') {
+                      return (
+                        <li>
+                          <div class="row1">
+                            <span class="title-text">{a.post.title}</span>
+                            <span class="sub">{a.post.collection} · {a.post.word_count} words</span>
+                          </div>
+                          <p class="summary">{a.post.excerpt}</p>
+                          <div class="tags">
+                            <span class={`pill ${a.post.tier}`}>{a.post.tier}</span>
+                            {a.post.pub_date && <span class="pill bronze">{a.post.pub_date}</span>}
+                          </div>
+                        </li>
+                      );
+                    }
+                    return (
+                      <li>
+                        <div class="row1">
+                          <span class="title-text">{a.repo.name}</span>
+                          <span class="sub">★ {a.repo.star_count} · {a.repo.primary_language ?? '–'}</span>
+                        </div>
+                        {a.repo.description && <p class="summary">{a.repo.description}</p>}
+                        <div class="tags">
+                          <span class={`pill ${a.repo.visibility}`}>{a.repo.visibility}</span>
+                          {a.repo.is_shipped && <span class="pill done">shipped</span>}
+                          <a href={a.repo.url} target="_blank" rel="noopener">github</a>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+      </section>
+    );
+  })}
+</Page>

@@ -1,0 +1,99 @@
+---
+import Page from '../layouts/Page.astro';
+import { data, checklist } from '../lib/data.ts';
+
+const filled = data.coverage.filter((c) => c.artifact_count > 0).length;
+const total = data.coverage.length;
+
+const doneCount = checklist.filter((c) => c.status === 'done').length;
+const inProgressCount = checklist.filter((c) => c.status === 'in-progress').length;
+const todoCount = checklist.filter((c) => c.status === 'todo').length;
+
+// Blocking requirements surface above the fold.
+const blocking = checklist.filter((c) => c.blocking);
+const topAnnouncement = data.announcements[0] ?? null;
+const linkify = (s: string) =>
+  s.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+---
+<Page title="ePortfolio status" active="home" meta={[
+  data.program.degree,
+  `target ${data.graduation.target_term}`,
+]} fetchedAt={data.fetched_at}>
+
+  <section class="hero">
+    <p class="countdown">{data.graduation.days_remaining}<small>days to deadline ({data.graduation.target_date})</small></p>
+    <p>Deadline derived from your configured term end and deadline offset for {data.graduation.target_term}.</p>
+    <div class="ratios">
+      <span>Requirements: <b>{doneCount}</b> done · <b>{inProgressCount}</b> in-progress · <b>{todoCount}</b> todo</span>
+      {total > 0 && <span>Competencies: <b>{filled}/{total}</b> covered</span>}
+    </div>
+  </section>
+
+  {blocking.length > 0 && (
+    <div>
+      <h2>Blocking requirements</h2>
+      <p>These must be done to graduate. See <a href="/checklist">the full checklist</a> for everything.</p>
+      <ul class="checklist">
+        {blocking.map((c) => (
+          <li>
+            <span class={`pill ${c.status}`}>{c.status}</span>
+            <span>
+              <span class="label-text">{c.label}<span class="pill gold" style="margin-left:8px">blocking</span></span>
+              <p class="description" set:html={linkify(c.description)}></p>
+              <code class="cli-hint">gradtrack check {c.id} --status done</code>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {total > 0 && (
+    <div>
+      <h2>Coverage by competency</h2>
+      <p>Artifact counts are heuristic - refine by hand in <code>~/.gradtrack/state.json</code> or your config.</p>
+      <ul class="coverage">
+        {data.program.competencies.map((comp) => {
+          const c = data.coverage.find((x) => x.competency_id === comp.id);
+          const n = c?.artifact_count ?? 0;
+          return (
+            <li>
+              <span class={`icon ${n === 0 ? 'empty' : ''}`}>{n === 0 ? '✗' : n >= 2 ? '✓✓' : '✓'}</span>
+              <span>
+                <strong>{comp.label}</strong>
+                <br />
+                <small class="meta">{comp.description.slice(0, 240)}</small>
+              </span>
+              <span class="count">{n}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p><a href="/requirements">See artifacts mapped per competency →</a></p>
+    </div>
+  )}
+
+  {topAnnouncement && (
+    <div>
+      <h2>Latest course announcement</h2>
+      <ul class="cards">
+        <li>
+          <div class="row1">
+            <span class="title-text">{topAnnouncement.title}</span>
+            <span class="sub">{topAnnouncement.course_code}</span>
+          </div>
+          {topAnnouncement.summary && <p class="summary">{topAnnouncement.summary.slice(0, 300)}</p>}
+          <div class="tags">
+            {topAnnouncement.graduation_keywords.map((k) => (
+              <span class="pill gold">{k}</span>
+            ))}
+            {topAnnouncement.url && (
+              <a href={topAnnouncement.url} target="_blank" rel="noopener">open announcement</a>
+            )}
+          </div>
+        </li>
+      </ul>
+      <p><a href="/canvas">All graduation-tagged announcements →</a></p>
+    </div>
+  )}
+</Page>

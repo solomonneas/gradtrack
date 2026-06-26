@@ -1,0 +1,81 @@
+---
+import '../styles/tokens.css';
+import { theme } from '../lib/data.ts';
+
+interface Props {
+  title: string;
+  active?: 'home' | 'requirements' | 'artifacts' | 'canvas' | 'checklist';
+  meta?: string[];
+  fetchedAt?: string;
+}
+
+const { title, active = 'home', meta = [], fetchedAt } = Astro.props;
+
+// Accent colors come from gradtrack.config.json (theme block), surfaced via
+// the theme.json the CLI writes. Inject them as inline CSS variables so a user
+// can re-theme without touching CSS.
+const themeStyle = [
+  `--accent:${theme.accent}`,
+  `--accent-soft:${theme.accentSoft}`,
+  `--accent-alt:${theme.accentAlt}`,
+  `--accent-alt-soft:${theme.accentAltSoft}`,
+].join(';');
+---
+<!doctype html>
+<html lang="en" style={themeStyle}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} - {theme.label}</title>
+    <link rel="preconnect" href="https://rsms.me" />
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('gradtrack-theme');
+          if (t === 'alt') document.documentElement.setAttribute('data-theme', 'alt');
+        } catch (e) { /* localStorage blocked */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <main>
+      <nav class="topnav" aria-label="Sections">
+        <a href="/" class={active === 'home' ? 'active' : ''}>[home]</a>
+        <a href="/requirements" class={active === 'requirements' ? 'active' : ''}>[requirements]</a>
+        <a href="/artifacts" class={active === 'artifacts' ? 'active' : ''}>[artifacts]</a>
+        <a href="/canvas" class={active === 'canvas' ? 'active' : ''}>[announcements]</a>
+        <a href="/checklist" class={active === 'checklist' ? 'active' : ''}>[checklist]</a>
+      </nav>
+      {meta.length > 0 && (
+        <p class="meta">
+          {meta.map((m) => <span>{m}</span>)}
+        </p>
+      )}
+      <h1 class="title">{title}</h1>
+      <slot />
+      <footer class="stamp">
+        <span>{fetchedAt && `synced ${fetchedAt.slice(0, 16).replace('T', ' ')}`}</span>
+        <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Toggle theme">switch accent</button>
+      </footer>
+      <script is:inline>
+        (function () {
+          var btn = document.getElementById('theme-toggle');
+          if (!btn) return;
+          function label() {
+            var t = document.documentElement.getAttribute('data-theme');
+            btn.textContent = t === 'alt' ? 'switch to primary accent' : 'switch to alt accent';
+          }
+          label();
+          btn.addEventListener('click', function () {
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'alt' ? 'primary' : 'alt';
+            if (next === 'alt') document.documentElement.setAttribute('data-theme', 'alt');
+            else document.documentElement.removeAttribute('data-theme');
+            try { localStorage.setItem('gradtrack-theme', next); } catch (e) { /* ignore */ }
+            label();
+          });
+        })();
+      </script>
+    </main>
+  </body>
+</html>

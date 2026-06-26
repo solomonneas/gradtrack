@@ -1,0 +1,12 @@
+[Unit]
+Description=gradtrack weekly refresh
+Requires=gradtrack.service
+
+[Timer]
+OnCalendar=Sun *-*-* 06:00:00
+RandomizedDelaySec=600
+Persistent=true
+Unit=gradtrack.service
+
+[Install]
+WantedBy=timers.target

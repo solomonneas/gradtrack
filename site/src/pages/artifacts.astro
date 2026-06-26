@@ -1,0 +1,84 @@
+---
+import Page from '../layouts/Page.astro';
+import { data } from '../lib/data.ts';
+
+const goldBlog = data.blog.filter((b) => b.tier === 'gold').sort((a, b) => (b.pub_date ?? '').localeCompare(a.pub_date ?? ''));
+const silverBlog = data.blog.filter((b) => b.tier === 'silver').sort((a, b) => (b.pub_date ?? '').localeCompare(a.pub_date ?? ''));
+const portfolioRepos = data.repos.filter((r) => r.is_security_themed).slice(0, 30);
+const coursework = data.coursework.slice().sort((a, b) => b.semester.localeCompare(a.semester));
+---
+<Page title="Artifacts" active="artifacts" meta={[
+  `${coursework.length} coursework`,
+  `${data.blog.length} blog posts (${goldBlog.length} gold)`,
+  `${portfolioRepos.length} repos`,
+]} fetchedAt={data.fetched_at}>
+
+  <h2>Coursework</h2>
+  <ul class="cards">
+    {coursework.map((c) => (
+      <li>
+        <div class="row1">
+          <span class="title-text">{c.title}</span>
+          <span class="sub">{c.course_code} · {c.semester}</span>
+        </div>
+        {c.summary && <p class="summary">{c.summary}</p>}
+        <div class="tags">
+          <span class={`pill ${c.status === 'completed' ? 'done' : c.status === 'in-progress' ? 'in-progress' : 'todo'}`}>{c.status}</span>
+          <span class="pill bronze">{c.kind}</span>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <h2>Gold-tier blog posts</h2>
+  <ul class="cards">
+    {goldBlog.map((b) => (
+      <li>
+        <div class="row1">
+          <span class="title-text">{b.title}</span>
+          <span class="sub">{b.word_count} words · {b.pub_date ?? 'undated'}</span>
+        </div>
+        <p class="summary">{b.excerpt}</p>
+        <div class="tags">
+          <span class="pill gold">gold</span>
+          {b.tags.slice(0, 4).map((t) => <span class="pill bronze">{t}</span>)}
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <h2>Silver-tier blog posts</h2>
+  <ul class="cards">
+    {silverBlog.slice(0, 12).map((b) => (
+      <li>
+        <div class="row1">
+          <span class="title-text">{b.title}</span>
+          <span class="sub">{b.word_count} words · {b.pub_date ?? 'undated'}</span>
+        </div>
+        <p class="summary">{b.excerpt}</p>
+        <div class="tags">
+          <span class="pill silver">silver</span>
+          {b.tags.slice(0, 4).map((t) => <span class="pill bronze">{t}</span>)}
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <h2>Repos</h2>
+  <ul class="cards">
+    {portfolioRepos.map((r) => (
+      <li>
+        <div class="row1">
+          <span class="title-text">{r.name}</span>
+          <span class="sub">★ {r.star_count} · {r.primary_language ?? '–'}</span>
+        </div>
+        {r.description && <p class="summary">{r.description}</p>}
+        <div class="tags">
+          <span class={`pill ${r.visibility}`}>{r.visibility}</span>
+          {r.is_shipped && <span class="pill done">shipped</span>}
+          <a href={r.url} target="_blank" rel="noopener">github</a>
+        </div>
+      </li>
+    ))}
+  </ul>
+</Page>

@@ -1,0 +1,34 @@
+---
+import Page from '../layouts/Page.astro';
+import { data } from '../lib/data.ts';
+
+const announcements = data.announcements;
+---
+<Page title="Course announcements" active="canvas" meta={[
+  `${announcements.length} captured`,
+  'graduation-tagged',
+]} fetchedAt={data.fetched_at}>
+
+  <p>Graduation-related course announcements aggregated from an optional Canvas snapshot source (see the <code>canvas</code> block in your config). Each notification appears once, on the day it was first captured.</p>
+
+  {announcements.length === 0 && (
+    <p>No graduation-tagged announcements captured. The Canvas source may be disabled - it is optional. Run <code>gradtrack sync</code> after your snapshot source updates.</p>
+  )}
+
+  <ul class="cards">
+    {announcements.map((a) => (
+      <li>
+        <div class="row1">
+          <span class="title-text">{a.title}</span>
+          <span class="sub">{a.posted_at?.slice(0, 16).replace('T', ' ') ?? a.kind}</span>
+        </div>
+        {a.summary && <p class="summary">{a.summary.slice(0, 600)}</p>}
+        <div class="tags">
+          {a.graduation_keywords.map((kw) => <span class="pill gold">{kw}</span>)}
+          {a.labels.map((l) => <span class="pill bronze">{l}</span>)}
+          {a.url && <a href={a.url} target="_blank" rel="noopener">open announcement</a>}
+        </div>
+      </li>
+    ))}
+  </ul>
+</Page>
